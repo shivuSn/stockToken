@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract StockToken is ERC20, Ownable {
+
+    constructor() ERC20("StockToken", "STK") Ownable(msg.sender) {}
+
+    function mint(address to, uint256 quantity) external onlyOwner {
+        require(quantity > 0, "No tokens will be minted");
+        _mint(to, quantity);
+    }
+
+    function burn(uint256 quantity) external {
+        require(quantity > 0, "Invalid  quantity to burn tokens");
+        require(quantity <= balanceOf(_msgSender()), "Value entered is more  than minted tokens");
+        _burn(_msgSender(), quantity);
+    }
+
+    function transfer(address to, uint256 quantity) public override returns (bool) {
+        require(quantity > 0, "Transfer a countable quantity of tokens");
+        require(quantity <= balanceOf(_msgSender()), "Not enough tokens to transfer");
+        _transfer(_msgSender(), to, quantity);
+        return true;
+    }
+}
